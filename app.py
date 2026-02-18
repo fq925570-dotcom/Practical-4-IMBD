@@ -1,31 +1,48 @@
 import streamlit as st
-import numpy as np
-import m at pl ot li b . pyplot as plt
-from sklearn . neighbors import K N e i g h b o r s C l a s s i f i e r
-st . s e t _ p a g e _ c o n f i g ( pag e_ ti tl e = " KNN Weather Cla ss if ie r " )
-st . title ( " KNN Weather C l a s s i f i c a t i o n " )
-X = np . array ([[50 , 70] , [25 , 80] , [27 , 60] , [31 , 65] , [23 , 85] , [20 , 75]])
-y = np . array ([0 , 1 , 0 , 0 , 1 , 1])
-label_map = {0: " Sunny " , 1: " Rainy " }
-st . sidebar . header ( " Input Features " )
-temp = st . sidebar . slider ( " T e m p e r a t u r e " , 10 , 60 , 26)
-hum = st . sidebar . slider ( " Humidity " , 50 , 95 , 78)
-knn = K N e i g h b o r s C l a s s i f i e r ( n _ n e i g h b o r s =3)
-knn . fit (X , y )
-new_data = np . array ([[ temp , hum ]])
-pr ed ic ti on = knn . predict ( new_data ) [0]
-st . write ( f " Predicted Weather : **{ label_map [ pr edi ct io n ]}** " )
-fig , ax = plt . subplots ()
-ax . scatter ( X [ y ==0 , 0] , X [ y ==0 , 1] , color = ’ orange ’ , label = ’ Sunny ’ , s =100 ,
-edgecolor = ’k ’)
-ax . scatter ( X [ y ==1 , 0] , X [ y ==1 , 1] , color = ’ blue ’ , label = ’ Rainy ’ , s =100 ,
-edgecolor = ’k ’)
-ax . scatter ( temp , hum , color = ’ red ’ if pre di ct io n ==1 else ’ orange ’ , marker = ’* ’
+from sklearn . f e a t u r e _ e x t r a c t i o n . text import T f i d f V e c t o r i z e r
+from sklearn . svm import LinearSVC
+from sklearn . m o d e l _ s e l e c t i o n import t r a i n _ t e s t _ s p l i t
+from sklearn . metrics import a c c u r a c y _ s c o r e
+st . title ( " Spam Email Detector " )
+emails = [ " Win a free iPhone now "
 ,
-s =300 , edgecolor = ’ black ’ , label = f ’ New Day : { label_map [ pr ed ic ti on ]} ’)
-ax . set _x la be l ( ’ T e m p e r a t u r e ’)
-ax . set _y la be l ( ’ Humidity ’)
-ax . set_title ( ’ KNN Weather C l a s s i f i c a t i o n ’)
-ax . legend ()
-ax . grid ( True )
-st . pyplot ( fig )
+" Meeting at 11 am tomorrow "
+,
+"
+C o n g r a t u l a t i o n s you won lottery "
+,
+" Project di sc us si on with team "
+,
+" Claim your prize i m m e d i a t e l y "
+,
+"
+Please find the attached report "
+,
+" Limited offer buy now "
+,
+" Urgent offer expires today "
+,
+" Schedule
+the meeting for Monday "
+,
+" You have won a cash prize "
+,
+" Monthly p e r f o r m a n c e report attached "
+,
+" Exclusive deal just for you " ]
+labels = [1 , 0 , 1 , 0 , 1 , 0 , 1 , 1 , 0 , 1 , 0 , 1]
+ve ct or iz er = T f i d f V e c t o r i z e r ( lowercase = True , s top _w or ds = " english "
+,
+n g r a m _ r a n g e =(1 , 2) , max_df =0.9 , min_df =1)
+X = ve ct or iz er . f i t _ t r a n s f o r m ( emails )
+X_train , X_test , y_train , y_test = t r a i n _ t e s t _ s p l i t (X , labels , test_size
+=0.25 , r a n d o m _ s t a t e =42 , stratify = labels )
+model = LinearSVC ( C =1.0 , r a n d o m _ s t a t e =42)
+model . fit ( X_train , y_train )
+st . write ( f " Model Accuracy : { a c c u r a c y _ s c o r e ( y_test , model . predict ( X_test ) ) } " )
+user_msg = st . text_area ( " Enter Email Message " )
+if st . button ( " Check " ) :
+msg_vec = ve cto ri ze r . transform ([ user_msg ])
+pred = model . predict ( msg_vec ) [0]
+st . write ( " Result : ** Spam Email ** " if pred == 1 else " Result : ** Not Spam
+Email ** " )
